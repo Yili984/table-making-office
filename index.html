@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Table-Making Office · 1792</title>
+<style>
+:root {
+  --paper:   #f2e6c8;
+  --paper2:  #e8d4a2;
+  --ink:     #1c1008;
+  --inkf:    #4a2e18;
+  --acc:     #7a3e10;
+  --gold:    #b88a2a;
+  --red:     #8b1c1c;
+  --green:   #2a6435;
+  --blue:    #1c3d5c;
+  --purple:  #4a2a6a;
+  --shadow:  rgba(28,16,8,.18);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Courier New",monospace;background:#1c1008;color:var(--ink);min-height:100vh;padding:1rem}
+#app{max-width:1120px;margin:0 auto;background:var(--paper);border:2px solid rgba(28,16,8,.35);overflow:hidden}
+
+/* ── HEADER ── */
+header{background:var(--ink);color:var(--paper);padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:.75rem}
+.title-block .t1{font-family:Georgia,serif;font-size:1.35rem;letter-spacing:.04em}
+.title-block .t2{font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;opacity:.45;margin-top:.15rem}
+.metrics{display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap}
+.metric{text-align:center}
+.mlbl{display:block;font-size:.55rem;letter-spacing:.22em;text-transform:uppercase;opacity:.45;margin-bottom:.2rem}
+.mval{font-family:Georgia,serif;font-size:1.15rem}
+.rep-wrap{display:flex;align-items:center;gap:.6rem}
+.rep-bar-bg{width:100px;height:7px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden}
+#rep-fill{height:100%;background:var(--gold);border-radius:4px;transition:width .4s,background .4s}
+
+/* ── INTRO ── */
+.intro{padding:1.25rem 1.5rem;border-bottom:1px solid rgba(28,16,8,.12);display:flex;gap:2rem;flex-wrap:wrap;align-items:flex-start}
+.intro-text{flex:2;min-width:220px}
+.intro-text p{font-size:.82rem;line-height:1.75;color:var(--inkf);margin-bottom:.6rem}
+.intro-text p:last-child{margin-bottom:0}
+.intro-text strong{color:var(--ink)}
+.intro-rules{flex:1;min-width:180px;background:var(--paper2);border-left:3px solid var(--acc);padding:.85rem 1rem}
+.intro-rules .irl{font-size:.58rem;letter-spacing:.25em;text-transform:uppercase;color:var(--acc);margin-bottom:.55rem}
+.intro-rules li{font-size:.75rem;line-height:1.6;color:var(--inkf);margin-left:1rem;margin-bottom:.2rem}
+
+/* ── EVENT BANNER ── */
+#event-banner{display:none;padding:.6rem 1.5rem;font-size:.8rem;border-bottom:1px solid rgba(28,16,8,.12);align-items:center;gap:.75rem}
+#event-banner.show{display:flex}
+.ev-tag{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;padding:.2rem .5rem;border-radius:2px;flex-shrink:0}
+.ev-ok{background:rgba(42,100,53,.15);color:var(--green)}
+.ev-warn{background:rgba(139,100,28,.15);color:#7a5010}
+.ev-bad{background:rgba(139,28,28,.15);color:var(--red)}
+
+/* ── PIPELINE ── */
+.pipeline{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid rgba(28,16,8,.12)}
+.stage{border-right:1px solid rgba(28,16,8,.1);padding:1rem;display:flex;flex-direction:column;min-height:300px}
+.stage:last-child{border-right:none}
+.sh{display:flex;justify-content:space-between;align-items:baseline;padding-bottom:.5rem;margin-bottom:.75rem;border-bottom:2px solid currentColor}
+.sname{font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;font-weight:bold}
+.scap{font-size:.72rem;font-family:Georgia,serif;opacity:.7}
+.s-theory     {color:var(--acc)}
+.s-translation{color:var(--green)}
+.s-computing  {color:var(--blue)}
+.s-checking   {color:var(--purple)}
+
+.workers{flex:1;display:flex;flex-direction:column;gap:.45rem;min-height:80px}
+.empty-hint{font-size:.7rem;opacity:.3;font-style:italic;text-align:center;padding:1rem 0;line-height:1.6}
+.wcrd{background:var(--paper2);border:1px solid rgba(28,16,8,.1);border-left:3px solid currentColor;padding:.35rem .55rem;display:flex;justify-content:space-between;align-items:center;border-radius:1px}
+.wi{flex:1;min-width:0}
+.wn{font-size:.75rem;font-weight:bold;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ws{font-size:.6rem;opacity:.55;margin-top:.1rem}
+.xbtn{background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;padding:.15rem .35rem;opacity:.4;transition:opacity .2s;flex-shrink:0;line-height:1}
+.xbtn:hover{opacity:1}
+
+.hire-section{margin-top:.75rem;display:flex;flex-direction:column;gap:.4rem}
+.hbtn{background:transparent;border:1px dashed rgba(28,16,8,.22);color:inherit;font-family:"Courier New",monospace;font-size:.68rem;padding:.38rem .55rem;cursor:pointer;text-align:left;transition:all .18s;line-height:1.4}
+.hbtn:hover{border-style:solid;background:var(--paper2)}
+.hbtn .ht{display:block;font-weight:bold;margin-bottom:.1rem}
+.hbtn .hd{display:block;opacity:.5;font-size:.6rem}
+
+/* ── FLOW BAR ── */
+.flow-bar{display:flex;align-items:center;flex-wrap:wrap;gap:.4rem .3rem;padding:.65rem 1.5rem;background:rgba(28,16,8,.04);border-bottom:1px solid rgba(28,16,8,.1);font-size:.72rem}
+.fstage{display:flex;align-items:center;gap:.3rem}
+.fnum{font-family:Georgia,serif;font-size:1rem;font-weight:bold}
+.flbl{font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;opacity:.45}
+.farr{opacity:.22;font-size:1.1rem;margin:0 .2rem}
+.bottleneck-tag{font-size:.6rem;background:rgba(139,28,28,.1);color:var(--red);padding:.1rem .4rem;border-radius:2px;letter-spacing:.12em;text-transform:uppercase}
+.fnum.bn{color:var(--red)}
+
+/* ── FORECAST ── */
+.forecast{display:flex;flex-wrap:wrap;gap:.5rem 2rem;padding:.65rem 1.5rem;background:var(--paper2);border-bottom:1px solid rgba(28,16,8,.1);align-items:center}
+.fi{text-align:center}
+.flb{display:block;font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;opacity:.45;margin-bottom:.15rem}
+.fv{font-family:Georgia,serif;font-size:1rem}
+.pos{color:var(--green)}.neg{color:var(--red)}.warn{color:#8b6010}
+.forecast-note{font-size:.7rem;opacity:.5;font-style:italic;flex:1;min-width:180px}
+
+/* ── CONTROLS ── */
+.ctrl{padding:.85rem 1.5rem;display:flex;align-items:center;gap:1rem;border-bottom:1px solid rgba(28,16,8,.1);flex-wrap:wrap}
+#run-btn{background:var(--ink);color:var(--paper);border:none;font-family:"Courier New",monospace;font-size:.88rem;letter-spacing:.14em;padding:.65rem 2.5rem;cursor:pointer;transition:background .18s;text-transform:uppercase;flex-shrink:0}
+#run-btn:hover:not(:disabled){background:var(--acc)}
+#run-btn:disabled{opacity:.38;cursor:not-allowed}
+.ctrl-hint{font-size:.75rem;opacity:.5;font-style:italic;flex:1}
+
+/* ── LOG ── */
+.log-header{padding:.5rem 1.5rem;display:flex;align-items:center;gap:1rem;border-bottom:1px solid rgba(28,16,8,.08)}
+.log-title{font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;opacity:.45}
+.log{max-height:220px;overflow-y:auto;padding:.25rem 0}
+.lentry{padding:.55rem 1.5rem;border-bottom:1px solid rgba(28,16,8,.06);display:flex;flex-direction:column;gap:.3rem;animation:fadeIn .35s ease-out}
+.lentry:last-child{border-bottom:none}
+.le-top{display:flex;gap:1rem;align-items:baseline;flex-wrap:wrap}
+.lwk{font-family:Georgia,serif;font-size:.82rem;color:var(--acc);flex-shrink:0;min-width:52px}
+.ltxt{font-size:.8rem;line-height:1.5;flex:1}
+.le-stats{display:flex;gap:.5rem;flex-wrap:wrap}
+.ls{font-size:.65rem;padding:.1rem .4rem;border-radius:2px}
+.ls-ok{background:rgba(42,100,53,.1);color:var(--green)}
+.ls-err{background:rgba(139,28,28,.1);color:var(--red)}
+.ls-info{background:rgba(28,16,8,.07)}
+.ls-warn{background:rgba(139,96,16,.1);color:#7a5010}
+
+/* ── OVERLAY ── */
+.ov{display:none;position:fixed;inset:0;background:rgba(28,16,8,.88);z-index:200;align-items:center;justify-content:center;padding:2rem}
+.ov.show{display:flex}
+.ov-box{background:var(--paper);max-width:500px;width:100%;padding:2.5rem;border-top:4px solid var(--acc);text-align:center}
+.ov-box h2{font-family:Georgia,serif;font-size:2rem;margin-bottom:.5rem}
+.ov-rating{font-size:.68rem;letter-spacing:.25em;text-transform:uppercase;color:var(--acc);margin-bottom:1.5rem}
+.ov-box p{font-size:.87rem;line-height:1.65;color:var(--inkf);margin-bottom:1rem;max-width:380px;margin-left:auto;margin-right:auto}
+.ov-stats{display:flex;justify-content:center;gap:2rem;margin:1.5rem 0;flex-wrap:wrap}
+.ov-stat-n{display:block;font-family:Georgia,serif;font-size:2rem;color:var(--ink)}
+.ov-stat-l{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;opacity:.45}
+.ov-btn{background:var(--ink);color:var(--paper);border:none;font-family:"Courier New",monospace;font-size:.85rem;letter-spacing:.14em;padding:.7rem 2.5rem;cursor:pointer;margin-top:1rem}
+.ov-btn:hover{background:var(--acc)}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media(max-width:700px){.pipeline{grid-template-columns:repeat(2,1fr)}.stage:nth-child(2){border-right:none}}
+@media(max-width:460px){.pipeline{grid-template-columns:1fr}.stage{border-right:none;border-bottom:1px solid rgba(28,16,8,.1)}}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- HEADER -->
+<header>
+  <div class="title-block">
+    <div class="t1">The Mathematical Table Office</div>
+    <div class="t2">London · 1792 · Division of Labour Simulation</div>
+  </div>
+  <div class="metrics">
+    <div class="metric"><span class="mlbl">Week</span><span class="mval" id="wk-disp">1 / 10</span></div>
+    <div class="metric"><span class="mlbl">Treasury</span><span class="mval" id="bud-disp">£70</span></div>
+    <div class="metric">
+      <span class="mlbl">Reputation</span>
+      <div class="rep-wrap">
+        <div class="rep-bar-bg"><div id="rep-fill"></div></div>
+        <span class="mval" id="rep-disp">75</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- INTRO -->
+<div class="intro">
+  <div class="intro-text">
+    <p>
+      It is <strong>1792</strong>. Across Europe, governments and navies depend on printed mathematical
+      tables — logarithms, trigonometric values, interest rates — to navigate ships, aim artillery, and
+      manage finance. The problem: every table has been calculated <em>by hand</em>, and human calculators
+      make mistakes. Errors compound silently through the pipeline, reaching the printer uncorrected,
+      and cost lives.
+    </p>
+    <p>
+      You have been appointed superintendent of a small <strong>table-making office</strong> in London.
+      Your task is to organise the labour. Following the method pioneered by Gaspard de Prony — and later
+      admired by Charles Babbage — work is divided into three specialised stages:
+      <strong>theorists</strong> derive the formulas, <strong>translators</strong> convert them into
+      step-by-step instructions, and <strong>computers</strong> perform the arithmetic. A fourth stage,
+      <strong>checking</strong>, is optional — but without it, every error your computers make will be
+      published to subscribers.
+    </p>
+    <p>
+      You must hire workers, assign them to roles, and run the office for ten weeks. The pipeline moves
+      at the speed of its <strong>slowest stage</strong> — flood the computing floor with cheap junior
+      computers and you will produce fast, error-riddled tables. Invest in senior computers and checkers
+      and you produce slowly but accurately. Overspend on wages and the treasury runs dry. Cut corners
+      on checking and your reputation collapses.
+    </p>
+    <p>
+      Every decision involves a trade-off. Errors do not announce themselves — they propagate quietly
+      through the system until a subscriber finds them in print. The only defense is redundancy: a
+      checking stage that catches mistakes before they leave the office.
+    </p>
+    <p>
+      Survive <strong>ten weeks</strong> with your reputation above 40 and your treasury solvent
+      to complete the season.
+    </p>
+  </div>
+  <div class="intro-rules">
+    <div class="irl">How to Play</div>
+    <ul>
+      <li>Hire workers into each stage using the <strong>+</strong> buttons below.</li>
+      <li>The pipeline throughput equals the <strong>slowest stage</strong> — find the bottleneck.</li>
+      <li>Errors from each stage multiply together before reaching the checkers.</li>
+      <li>Unchecked tables go straight to print — errors destroy reputation.</li>
+      <li>Click <strong>Run Week</strong> to simulate one week and read the ledger.</li>
+      <li>Dismiss a worker with the <strong>×</strong> on their card.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- EVENT BANNER -->
+<div id="event-banner">
+  <span class="ev-tag" id="ev-tag">Notice</span>
+  <span id="ev-text"></span>
+</div>
+
+<!-- PIPELINE -->
+<div class="pipeline">
+
+  <!-- THEORY -->
+  <div class="stage s-theory" id="stage-theory">
+    <div class="sh">
+      <span class="sname">Ι Theory</span>
+      <span class="scap" id="cap-theory">cap 0</span>
+    </div>
+    <div class="workers" id="wlist-theory">
+      <div class="empty-hint">No theorists.<br>Formulas cannot<br>be derived.</div>
+    </div>
+    <div class="hire-section">
+      <button class="hbtn s-theory" onclick="hire('theorist')">
+        <span class="ht">+ Theorist  £8/wk</span>
+        <span class="hd">5 formulas/wk · 3% error</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- TRANSLATION -->
+  <div class="stage s-translation" id="stage-translation">
+    <div class="sh">
+      <span class="sname">ΙΙ Translation</span>
+      <span class="scap" id="cap-translation">cap 0</span>
+    </div>
+    <div class="workers" id="wlist-translation">
+      <div class="empty-hint">No translators.<br>Formulas cannot<br>become instructions.</div>
+    </div>
+    <div class="hire-section">
+      <button class="hbtn s-translation" onclick="hire('translator')">
+        <span class="ht">+ Translator  £5/wk</span>
+        <span class="hd">15 batches/wk · 7% error</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- COMPUTING -->
+  <div class="stage s-computing" id="stage-computing">
+    <div class="sh">
+      <span class="sname">ΙΙΙ Computing</span>
+      <span class="scap" id="cap-computing">cap 0</span>
+    </div>
+    <div class="workers" id="wlist-computing">
+      <div class="empty-hint">No computers.<br>No calculations<br>will be performed.</div>
+    </div>
+    <div class="hire-section">
+      <button class="hbtn s-computing" onclick="hire('juniorComp')">
+        <span class="ht">+ Junior Computer  £2/wk</span>
+        <span class="hd">30/wk · 18% error · fast</span>
+      </button>
+      <button class="hbtn s-computing" onclick="hire('seniorComp')">
+        <span class="ht">+ Senior Computer  £4/wk</span>
+        <span class="hd">20/wk · 5% error · reliable</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- CHECKING -->
+  <div class="stage s-checking" id="stage-checking">
+    <div class="sh">
+      <span class="sname">ΙV Checking</span>
+      <span class="scap" id="cap-checking">cap 0</span>
+    </div>
+    <div class="workers" id="wlist-checking">
+      <div class="empty-hint">No checkers.<br>All errors will<br>reach the printer.</div>
+    </div>
+    <div class="hire-section">
+      <button class="hbtn s-checking" onclick="hire('checker')">
+        <span class="ht">+ Checker  £3/wk</span>
+        <span class="hd">50/wk · catches 80%</span>
+      </button>
+      <button class="hbtn s-checking" onclick="hire('headChecker')">
+        <span class="ht">+ Head Checker  £7/wk</span>
+        <span class="hd">30/wk · catches 96%</span>
+      </button>
+    </div>
+  </div>
+
+</div><!-- .pipeline -->
+
+<!-- FLOW BAR -->
+<div class="flow-bar" id="flow-bar">
+  <div class="fstage"><span class="fnum" id="fn-theory">0</span><span class="flbl">Theory</span></div>
+  <span class="farr">→</span>
+  <div class="fstage"><span class="fnum" id="fn-trans">0</span><span class="flbl">Translation</span></div>
+  <span class="farr">→</span>
+  <div class="fstage"><span class="fnum" id="fn-compute">0</span><span class="flbl">Computing</span></div>
+  <span class="farr">→</span>
+  <div class="fstage"><span class="fnum" id="fn-check">0</span><span class="flbl">Checked</span></div>
+  <span class="farr">→</span>
+  <div class="fstage"><span class="fnum" id="fn-out" style="color:var(--green)">0</span><span class="flbl">Tables/wk</span></div>
+  <span id="bn-tag" class="bottleneck-tag" style="display:none">bottleneck</span>
+</div>
+
+<!-- FORECAST -->
+<div class="forecast" id="forecast">
+  <div class="fi"><span class="flb">Tables/wk</span><span class="fv" id="fc-tables">0</span></div>
+  <div class="fi"><span class="flb">Error Risk</span><span class="fv" id="fc-err">—</span></div>
+  <div class="fi"><span class="flb">Unchecked</span><span class="fv" id="fc-unchk">—</span></div>
+  <div class="fi"><span class="flb">Wages/wk</span><span class="fv neg" id="fc-wages">£0</span></div>
+  <div class="fi"><span class="flb">Revenue/wk</span><span class="fv pos" id="fc-rev">£0</span></div>
+  <div class="fi"><span class="flb">Net/wk</span><span class="fv" id="fc-net">£0</span></div>
+  <span class="forecast-note" id="fc-note">Add workers to begin.</span>
+</div>
+
+<!-- CONTROLS -->
+<div class="ctrl">
+  <button id="run-btn" onclick="runWeek()">Run Week →</button>
+  <span class="ctrl-hint" id="ctrl-hint">Week 1 of 10. Assign workers then run the week.</span>
+</div>
+
+<!-- LOG -->
+<div class="log-header"><span class="log-title">Weekly Ledger</span></div>
+<div class="log" id="log">
+  <div class="lentry">
+    <div class="le-top">
+      <span class="lwk">Start</span>
+      <span class="ltxt">You have inherited a small table-making office with one theorist, one translator, and one junior computer already on the payroll. Errors are going unchecked — hire wisely before reputations suffers.</span>
+    </div>
+  </div>
+</div>
+
+</div><!-- #app -->
+
+<!-- OVERLAY -->
+<div class="ov" id="overlay">
+  <div class="ov-box">
+    <h2 id="ov-title">Office Closed</h2>
+    <div class="ov-rating" id="ov-rating">—</div>
+    <p id="ov-msg"></p>
+    <div class="ov-stats">
+      <div><span class="ov-stat-n" id="ov-tables">0</span><span class="ov-stat-l">Tables Published</span></div>
+      <div><span class="ov-stat-n" id="ov-errors">0</span><span class="ov-stat-l">Errors Printed</span></div>
+      <div><span class="ov-stat-n" id="ov-caught">0</span><span class="ov-stat-l">Errors Caught</span></div>
+    </div>
+    <button class="ov-btn" onclick="restartGame()">Open a New Office</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ═══════════════════════════════════ DATA */
+
+const DEFS = {
+  theorist:   { name:'Theorist',       role:'theory',      wage:8,  throughput:5,  errorRate:.03, icon:'Σ' },
+  translator: { name:'Translator',     role:'translation', wage:5,  throughput:15, errorRate:.07, icon:'≡' },
+  juniorComp: { name:'Jr. Computer',   role:'computing',   wage:2,  throughput:30, errorRate:.18, icon:'×' },
+  seniorComp: { name:'Sr. Computer',   role:'computing',   wage:4,  throughput:20, errorRate:.05, icon:'×' },
+  checker:    { name:'Checker',        role:'checking',    wage:3,  throughput:50, catchRate:.80, icon:'✓' },
+  headChecker:{ name:'Head Checker',   role:'checking',    wage:7,  throughput:30, catchRate:.96, icon:'✓' },
+};
+
+const EVENTS = [
+  { id:'illness',   cls:'ev-warn', tag:'Notice',     text:'One worker reports ill — pipeline throughput reduced 15% this week.',              mod:{tpMult:.85} },
+  { id:'inspector', cls:'ev-bad',  tag:'Warning',    text:'The Royal Society inspector visits. Published errors carry double reputational cost.', mod:{repMult:2} },
+  { id:'rush',      cls:'ev-ok',   tag:'Commission', text:'A rush order arrives from the Navy Board. Revenue doubled this week!',               mod:{revMult:2} },
+  { id:'fatigue',   cls:'ev-warn', tag:'Notice',     text:'Long shifts have taxed the computers. Error rates slightly elevated.',               mod:{errMult:1.35} },
+  { id:'method',    cls:'ev-ok',   tag:'Discovery',  text:'A translator has devised an elegant shorthand — translation errors halved.',         mod:{transErrMult:.5} },
+  { id:'pastErr',   cls:'ev-bad',  tag:'Complaint',  text:'A subscriber has discovered a printed error in last month\'s tables. Reputation −8.', immediate:{rep:-8} },
+  { id:'apprentice',cls:'ev-ok',   tag:'Visitor',    text:'A student apprentice joins the floor unpaid. Computing capacity +20 this week.',     mod:{extraCompute:20} },
+];
+
+/* ═══════════════════════════════════ STATE */
+
+let S; // game state
+
+function initState() {
+  S = {
+    week:      1,
+    budget:    70,
+    rep:       75,
+    workers:   { theory:[], translation:[], computing:[], checking:[] },
+    tablesOut: 0,
+    errPub:    0,
+    errCaught: 0,
+    over:      false,
+    nextEvent: null,
+    uid:       0,
+  };
+  // Starting workers
+  addWorker('theorist');
+  addWorker('translator');
+  addWorker('juniorComp');
+}
+
+function addWorker(typeId) {
+  const d = DEFS[typeId];
+  S.workers[d.role].push({ typeId, id: ++S.uid });
+}
+
+/* ═══════════════════════════════════ SIMULATION */
+
+function calcSim(overrides) {
+  // overrides = event modifier object (or {})
+  const o  = overrides || {};
+  const W  = S.workers;
+
+  const theoryTP  = W.theory.reduce((s,w)=>s+DEFS[w.typeId].throughput,0);
+  const transTP   = W.translation.reduce((s,w)=>s+DEFS[w.typeId].throughput,0);
+  const computeTP = W.computing.reduce((s,w)=>s+DEFS[w.typeId].throughput,0) + (o.extraCompute||0);
+  const checkTP   = W.checking.reduce((s,w)=>s+DEFS[w.typeId].throughput,0);
+
+  // Apply throughput multiplier
+  const tpm = o.tpMult||1;
+  const eff = {
+    theory:  Math.floor(theoryTP  * tpm),
+    trans:   Math.floor(transTP   * tpm),
+    compute: Math.floor(computeTP * tpm),
+  };
+
+  let tables = 0, bottleneck = null;
+  if (eff.theory===0||eff.trans===0||eff.compute===0) {
+    if (eff.theory===0)  bottleneck='theory';
+    else if(eff.trans===0)  bottleneck='translation';
+    else bottleneck='computing';
+  } else {
+    tables = Math.min(eff.theory, eff.trans, eff.compute);
+    const m = Math.min(eff.theory,eff.trans,eff.compute);
+    bottleneck = eff.theory===m ? 'theory' : eff.trans===m ? 'translation' : 'computing';
+    if (eff.theory===eff.trans && eff.trans===eff.compute) bottleneck=null; // perfectly balanced
+  }
+
+  // Error rates
+  const avgErr = (arr, key) => arr.length ? arr.reduce((s,w)=>s+DEFS[w.typeId][key],0)/arr.length : 0;
+  const tErr = avgErr(W.theory,'errorRate') * (o.errMult||1);
+  const xErr = avgErr(W.translation,'errorRate') * (o.errMult||1) * (o.transErrMult||1);
+  const cErr = avgErr(W.computing,'errorRate') * (o.errMult||1);
+
+  const pErr = 1 - (1-tErr)*(1-xErr)*(1-cErr);
+
+  // Stochastic errors
+  let errored = 0;
+  for (let i=0;i<tables;i++) if(Math.random()<pErr) errored++;
+
+  // Checking
+  const checked   = Math.min(checkTP, tables);
+  const unchecked = tables - checked;
+  const totalChkTP = W.checking.reduce((s,w)=>s+DEFS[w.typeId].throughput,0);
+  const avgCatch   = totalChkTP>0
+    ? W.checking.reduce((s,w)=>s+DEFS[w.typeId].catchRate*DEFS[w.typeId].throughput,0)/totalChkTP
+    : 0;
+
+  // Distribute errors proportionally between checked and unchecked
+  const pChk = tables>0 ? checked/tables : 0;
+  const errChk  = Math.round(errored * pChk);
+  const errUnchk = errored - errChk;
+
+  let caught = 0;
+  for (let i=0;i<errChk;i++) if(Math.random()<avgCatch) caught++;
+
+  const pubErr   = errored - caught;
+  const pubClean = tables  - pubErr;
+
+  // Wages
+  const allW   = [...W.theory,...W.translation,...W.computing,...W.checking];
+  const wages  = allW.reduce((s,w)=>s+DEFS[w.typeId].wage,0);
+  const revMult= o.revMult||1;
+  const revenue= tables * 4 * revMult;
+  const net    = revenue - wages;
+
+  // Rep delta
+  const repMult = o.repMult||1;
+  const repDelta= Math.round( pubErr * -5 * repMult + caught * 1 + pubClean * 0.3 );
+
+  return {
+    tables, bottleneck,
+    effTheory:eff.theory, effTrans:eff.trans, effCompute:eff.compute,
+    checkTP, checked, unchecked,
+    tErr, xErr, cErr, pErr,
+    errored, caught, pubErr, pubClean,
+    wages, revenue, net, repDelta,
+  };
+}
+
+/* ═══════════════════════════════════ GAME ACTIONS */
+
+function hire(typeId) {
+  if (S.over) return;
+  addWorker(typeId);
+  render();
+}
+
+function fire(role, id) {
+  if (S.over) return;
+  S.workers[role] = S.workers[role].filter(w=>w.id!==id);
+  render();
+}
+
+function runWeek() {
+  if (S.over) return;
+
+  // Pick event
+  const ev = S.nextEvent;
+  const mod = ev ? (ev.mod||{}) : {};
+
+  // Apply immediate event effects
+  if (ev && ev.immediate) {
+    if (ev.immediate.rep) S.rep = Math.max(0, Math.min(100, S.rep + ev.immediate.rep));
+  }
+
+  const sim = calcSim(mod);
+
+  // Deduct wages first — if can't afford, still run but flag
+  const canPay = S.budget >= sim.wages;
+  S.budget -= sim.wages;
+  S.budget += sim.revenue;
+  S.budget = Math.round(S.budget);
+
+  S.rep = Math.max(0, Math.min(100, S.rep + sim.repDelta));
+  S.rep = Math.round(S.rep);
+
+  S.tablesOut += sim.tables;
+  S.errPub    += sim.pubErr;
+  S.errCaught += sim.caught;
+
+  // Build log entry
+  addLog(S.week, sim, ev, canPay);
+
+  // Advance week
+  S.week++;
+
+  // Check game over conditions
+  if (S.rep <= 0) {
+    endGame('rep');
+    return;
+  }
+  if (S.budget < 0) {
+    // One chance: if they produce enough next week. But for simplicity: game over.
+    endGame('broke');
+    return;
+  }
+  if (S.week > 10) {
+    endGame('win');
+    return;
+  }
+
+  // Stage next event (30% chance)
+  S.nextEvent = Math.random()<0.3 ? EVENTS[Math.floor(Math.random()*EVENTS.length)] : null;
+
+  render();
+}
+
+function endGame(reason) {
+  S.over = true;
+  const ov = document.getElementById('overlay');
+  ov.classList.add('show');
+
+  document.getElementById('ov-tables').textContent = S.tablesOut;
+  document.getElementById('ov-errors').textContent = S.errPub;
+  document.getElementById('ov-caught').textContent = S.errCaught;
+
+  const accuracy = S.tablesOut>0 ? Math.round((1-S.errPub/S.tablesOut)*100) : 100;
+
+  if (reason==='win') {
+    document.getElementById('ov-title').textContent = 'Office Survives';
+    const rating = S.rep>=80 && accuracy>=95 ? 'Master Table-Maker'
+                 : S.rep>=60 && accuracy>=88 ? 'Reputable Office'
+                 : S.rep>=40 ? 'Adequate Output'
+                 : 'Barely Solvent';
+    document.getElementById('ov-rating').textContent = rating;
+    document.getElementById('ov-msg').textContent =
+      'Your office has completed its ten-week season. '+(
+      S.rep>=70
+      ? 'The division of labour — theorists, translators, computers, and checkers each mastering their narrow task — proved its worth. Your tables will be cited for years.'
+      : 'The tables were produced, though errors have cost you goodwill. A more rigorous checking regime would have served the office well.'
+      )+' Babbage himself noted that unchecked human error was the engine of ruin in any computational endeavour.'
+  } else if (reason==='rep') {
+    document.getElementById('ov-title').textContent = 'Office Closed';
+    document.getElementById('ov-rating').textContent = 'Reputation Destroyed';
+    document.getElementById('ov-msg').textContent =
+      'Subscribers have withdrawn in protest. Too many printed errors have made your tables unreliable. Without checking, each computer\'s mistake compounded through the pipeline and reached the public uncorrected. The office must close.';
+  } else {
+    document.getElementById('ov-title').textContent = 'Office Bankrupt';
+    document.getElementById('ov-rating').textContent = 'Treasury Exhausted';
+    document.getElementById('ov-msg').textContent =
+      'Without funds to meet the weekly payroll, the computers have stopped coming in. Revenue never sufficiently exceeded wages. The office must close.';
+  }
+  render();
+}
+
+function restartGame() {
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('log').innerHTML = `
+    <div class="lentry"><div class="le-top">
+      <span class="lwk">Start</span>
+      <span class="ltxt">A new office, a fresh ledger. One theorist, one translator, one junior computer. Hire carefully.</span>
+    </div></div>`;
+  initState();
+  render();
+}
+
+/* ═══════════════════════════════════ LOG */
+
+function addLog(week, sim, ev, canPay) {
+  const log = document.getElementById('log');
+  const d = document.createElement('div');
+  d.className = 'lentry';
+
+  // Main summary sentence
+  let txt = '';
+  if (sim.tables === 0) {
+    const stage = sim.bottleneck || 'an unknown stage';
+    txt = `No tables produced — ${stage} stage has no workers and blocked the pipeline.`;
+  } else {
+    txt = `Produced ${sim.tables} table${sim.tables!==1?'s':''}. `;
+    if (sim.errored===0) {
+      txt += 'No errors arose this week.';
+    } else {
+      txt += `${sim.errored} error${sim.errored!==1?'s':''} arose`;
+      if (sim.caught>0) txt += `, ${sim.caught} caught by checkers`;
+      if (sim.pubErr>0) txt += `, <strong>${sim.pubErr} published to subscribers</strong>`;
+      txt += '.';
+    }
+    if (sim.unchecked>0 && sim.errored>0) {
+      txt += ` ${sim.unchecked} table${sim.unchecked!==1?'s':''} went unchecked.`;
+    }
+  }
+
+  if (!canPay) txt += ' <em>Warning: wages exceeded treasury — deficit carried forward.</em>';
+
+  const netCls = sim.net>=0 ? 'ls-ok' : 'ls-err';
+  const repCls = sim.repDelta>=0 ? 'ls-ok' : 'ls-err';
+
+  const evNote = ev ? `<span class="ls ls-warn">${ev.tag}: ${ev.id}</span>` : '';
+
+  d.innerHTML = `
+    <div class="le-top">
+      <span class="lwk">Wk ${week}</span>
+      <span class="ltxt">${txt}</span>
+    </div>
+    <div class="le-stats">
+      <span class="ls ls-info">Tables: ${sim.tables}</span>
+      <span class="ls ${sim.pubErr>0?'ls-err':'ls-ok'}">Printed errors: ${sim.pubErr}</span>
+      <span class="ls ls-info">Wages: £${sim.wages}</span>
+      <span class="ls ls-info">Revenue: £${sim.revenue}</span>
+      <span class="ls ${netCls}">Net: ${sim.net>=0?'+':''}£${sim.net}</span>
+      <span class="ls ${repCls}">Rep: ${sim.repDelta>=0?'+':''}${sim.repDelta}</span>
+      ${evNote}
+    </div>`;
+
+  log.prepend(d);
+}
+
+/* ═══════════════════════════════════ RENDER */
+
+function render() {
+  // Header
+  document.getElementById('wk-disp').textContent  = `${Math.min(S.week,10)} / 10`;
+  document.getElementById('bud-disp').textContent = `£${S.budget}`;
+  document.getElementById('rep-disp').textContent = S.rep;
+  const fill = document.getElementById('rep-fill');
+  fill.style.width = S.rep+'%';
+  fill.style.background = S.rep>60 ? 'var(--gold)' : S.rep>30 ? '#c47820' : 'var(--red)';
+
+  // Event banner
+  const banner = document.getElementById('event-banner');
+  if (S.nextEvent && !S.over) {
+    const ev = S.nextEvent;
+    banner.classList.add('show');
+    const tag = document.getElementById('ev-tag');
+    tag.className = 'ev-tag '+(ev.cls||'ev-warn');
+    tag.textContent = ev.tag;
+    document.getElementById('ev-text').textContent = ev.text;
+  } else {
+    banner.classList.remove('show');
+  }
+
+  // Run button / hint
+  const rb = document.getElementById('run-btn');
+  rb.disabled = S.over;
+  const hint = document.getElementById('ctrl-hint');
+  if (!S.over) {
+    hint.textContent = S.week<=10
+      ? `Week ${S.week} of 10 — adjust workers, then run.`
+      : 'Final week complete.';
+  }
+
+  // Render each stage
+  ['theory','translation','computing','checking'].forEach(role => {
+    renderStage(role);
+  });
+
+  // Calculate forecast
+  const fc = calcSim(S.nextEvent ? (S.nextEvent.mod||{}) : {});
+  renderForecast(fc);
+  renderFlowBar(fc);
+}
+
+function renderStage(role) {
+  const workers = S.workers[role];
+  const list = document.getElementById('wlist-'+role);
+  const capEl = document.getElementById('cap-'+role);
+
+  // Capacity
+  const tp = workers.reduce((s,w)=>s+DEFS[w.typeId].throughput,0);
+  capEl.textContent = tp>0 ? `cap ${tp}` : 'cap 0';
+
+  // Worker cards
+  const colClass = `s-${role}`;
+  const emptyHints = {
+    theory:     'No theorists.\nFormulas cannot\nbe derived.',
+    translation:'No translators.\nFormulas cannot\nbecome instructions.',
+    computing:  'No computers.\nNo calculations\nwill be performed.',
+    checking:   'No checkers.\nAll errors will\nreach the printer.',
+  };
+
+  if (workers.length === 0) {
+    list.innerHTML = `<div class="empty-hint">${emptyHints[role].replace(/\n/g,'<br>')}</div>`;
+    return;
+  }
+
+  list.innerHTML = '';
+  workers.forEach(w => {
+    const d = DEFS[w.typeId];
+    const statTxt = d.catchRate != null
+      ? `£${d.wage}/wk · catches ${Math.round(d.catchRate*100)}%`
+      : `£${d.wage}/wk · ${Math.round(d.errorRate*100)}% error`;
+    const card = document.createElement('div');
+    card.className = `wcrd ${colClass}`;
+    card.innerHTML = `
+      <div class="wi">
+        <span class="wn">${d.icon} ${d.name}</span>
+        <span class="ws">${statTxt}</span>
+      </div>
+      <button class="xbtn" onclick="fire('${role}',${w.id})" title="Dismiss">×</button>`;
+    list.appendChild(card);
+  });
+}
+
+function renderFlowBar(fc) {
+  const set = (id, val, isBn) => {
+    const el = document.getElementById(id);
+    el.textContent = val;
+    el.classList.toggle('bn', !!isBn);
+  };
+  set('fn-theory',  fc.effTheory,  fc.bottleneck==='theory');
+  set('fn-trans',   fc.effTrans,   fc.bottleneck==='translation');
+  set('fn-compute', fc.effCompute, fc.bottleneck==='computing');
+  set('fn-check',   fc.checked);
+  document.getElementById('fn-out').textContent = fc.tables;
+
+  const bnTag = document.getElementById('bn-tag');
+  if (fc.bottleneck && fc.tables>0) {
+    bnTag.style.display='inline-block';
+    bnTag.textContent = fc.bottleneck+' is limiting';
+  } else if (fc.tables===0 && fc.bottleneck) {
+    bnTag.style.display='inline-block';
+    bnTag.textContent = 'no '+fc.bottleneck+' workers';
+  } else {
+    bnTag.style.display='none';
+  }
+}
+
+function renderForecast(fc) {
+  const pct = n => n==null||isNaN(n) ? '—' : Math.round(n*100)+'%';
+  const cls = (n, good, bad) => n>=good?'pos':n<=bad?'neg':'warn';
+
+  const tableEl = document.getElementById('fc-tables');
+  tableEl.textContent = fc.tables;
+  tableEl.className = 'fv '+(fc.tables>=8?'pos':fc.tables>=4?'warn':'neg');
+
+  const errEl = document.getElementById('fc-err');
+  errEl.textContent = fc.tables>0 ? pct(fc.pErr) : '—';
+  errEl.className = 'fv '+(fc.pErr<.05?'pos':fc.pErr<.15?'warn':'neg');
+
+  const unchkEl = document.getElementById('fc-unchk');
+  unchkEl.textContent = fc.tables>0 ? fc.unchecked+' tables' : '—';
+  unchkEl.className = 'fv '+(fc.unchecked===0?'pos':fc.unchecked<fc.tables/2?'warn':'neg');
+
+  document.getElementById('fc-wages').textContent = `£${fc.wages}`;
+  document.getElementById('fc-rev').textContent   = `£${fc.revenue}`;
+
+  const netEl = document.getElementById('fc-net');
+  netEl.textContent = `${fc.net>=0?'+':''}£${fc.net}`;
+  netEl.className = 'fv '+(fc.net>0?'pos':fc.net===0?'warn':'neg');
+
+  // Note
+  const notes = [];
+  if (fc.tables===0) notes.push('Pipeline blocked — all three production stages need workers.');
+  else {
+    if (fc.bottleneck) notes.push(`${fc.bottleneck} is the bottleneck.`);
+    if (fc.unchecked > fc.tables*0.5) notes.push('Most tables go unchecked — errors will reach subscribers.');
+    if (fc.pErr > 0.2) notes.push('High error rate — consider more senior computers.');
+    if (fc.net < 0) notes.push('Wages exceed revenue this week.');
+    if (notes.length===0) notes.push('Pipeline looks healthy.');
+  }
+  document.getElementById('fc-note').textContent = notes.join(' ');
+}
+
+/* ═══════════════════════════════════ INIT */
+initState();
+render();
+</script>
+</body>
+</html>
